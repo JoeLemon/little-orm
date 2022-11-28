@@ -1,5 +1,8 @@
 package com.joelemon.orm.binding;
 
+import cn.hutool.db.Session;
+import com.joelemon.orm.session.SqlSession;
+
 import java.lang.reflect.Proxy;
 import java.util.Map;
 
@@ -15,8 +18,9 @@ public class MapperProxyFactory<T> {
         this.mapperInterface = mapperInterface;
     }
 
-    public T newInstance(Map<String, String> sqlSession) {
-        final MapperProxy<T> mapperProxy = new MapperProxy<>(sqlSession, mapperInterface);
-        return (T) Proxy.newProxyInstance(mapperInterface.getClassLoader(), new Class[]{mapperInterface}, mapperProxy);
+    public T newInstance(SqlSession session) {
+        final MapperProxy<T> mapperProxy = new MapperProxy<>(session.getClass());
+        return (T) Proxy.newProxyInstance(mapperInterface.getClassLoader(),
+                new Class[]{mapperInterface}, mapperProxy);
     }
 }

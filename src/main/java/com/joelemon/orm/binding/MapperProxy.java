@@ -1,9 +1,13 @@
 package com.joelemon.orm.binding;
 
+import com.joelemon.orm.session.SqlSession;
+import com.sun.deploy.util.StringUtils;
+
 import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * orm代理
@@ -13,13 +17,9 @@ import java.util.Map;
 public class MapperProxy<T> implements InvocationHandler, Serializable {
 
     private static final long serialVersionUID = -1L;
-    private Map<String, String> sqlSession;
     private Class<T> mapperInterface;
-
-
-    public MapperProxy(Map<String, String> sqlSession, Class<T> mapperInterface) {
-        this.sqlSession = sqlSession;
-        this.mapperInterface = mapperInterface;
+    public MapperProxy(Class mapperIf) {
+        mapperInterface = mapperIf;
     }
 
     @Override
@@ -27,7 +27,9 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
         if (Object.class.equals(method.getDeclaringClass())) {
             return method.invoke(this, args);
         } else {
-            return "你的被代理了！" + sqlSession.get(mapperInterface.getName() + "." + method.getName());
+            return "\n代理方法执行：" + (mapperInterface.getName() + "." + method.getName())
+                    + "\n代理方法参数：" + Arrays.asList(args).stream().map(item -> String.valueOf(item))
+                    .collect(Collectors.joining("\n"));
         }
     }
 }
